@@ -13,6 +13,7 @@ const STATUS_LABEL = {
 
 let allTeams = [];
 let allMatches = [];
+let teamsById = {};
 
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
@@ -92,8 +93,11 @@ async function loadTeams(){
   const { data, error } = await sb.from('teams_public').select('*').order('created_at', { ascending: true });
   if (error) { console.error(error); return; }
   allTeams = data || [];
+  teamsById = {};
+  allTeams.forEach(t => { teamsById[t.id] = t; });
   renderTeams();
   updateHeroStats();
+  if (allMatches.length) { renderBracket(); populateResultMatchSelect(); } // names may arrive after matches did
 }
 
 function renderTeams(){
@@ -144,7 +148,7 @@ function showTeamHistory(teamId){
   } else {
     list.innerHTML = played.slice().reverse().map(m => {
       const isTeam1 = m.team1_id === teamId;
-      const opponent = isTeam1 ? m.team2?.team_name : m.team1?.team_name;
+      const opponent = isTeam1 ? teamsById[m.team2_id]?.team_name : teamsById[m.team1_id]?.team_name;
       const myScore = isTeam1 ? m.team1_score : m.team2_score;
       const oppScore = isTeam1 ? m.team2_score : m.team1_score;
       const won = m.winner_id === teamId;
@@ -169,7 +173,7 @@ function updateHeroStats(){
 async function loadMatches(){
   const { data, error } = await sb
     .from('matches')
-    .select('*, team1:team1_id(id,team_name), team2:team2_id(id,team_name), winner:winner_id(id,team_name)')
+    .select('*')
     .order('round', { ascending: true })
     .order('match_index', { ascending: true });
   if (error) { console.error(error); return; }
@@ -198,8 +202,10 @@ function renderBracket(){
 }
 
 function matchCardHtml(m){
-  const t1 = m.team1?.team_name || (m.is_bye ? null : 'TBD');
-  const t2 = m.is_bye ? 'BYE' : (m.team2?.team_name || 'TBD');
+  const t1name = teamsById[m.team1_id]?.team_name;
+  const t2name = teamsById[m.team2_id]?.team_name;
+  const t1 = t1name || (m.is_bye ? null : 'TBD');
+  const t2 = m.is_bye ? 'BYE' : (t2name || 'TBD');
   const t1win = m.winner_id && m.winner_id === m.team1_id;
   const t2win = m.winner_id && m.winner_id === m.team2_id;
   const s = STATUS_LABEL[m.status] || { text: m.status, cls: '' };
@@ -270,9 +276,11 @@ function populateResultMatchSelect(){
     return;
   }
   sel.disabled = false;
-  sel.innerHTML = `<option value="">Select your fixture…</option>` + eligible.map(m =>
-    `<option value="${m.id}">${escapeHtml(m.team1.team_name)} vs ${escapeHtml(m.team2.team_name)} — ${m.round_name || ('Round ' + m.round)}</option>`
-  ).join('');
+  sel.innerHTML = `<option value="">Select your fixture…</option>` + eligible.map(m => {
+    const n1 = teamsById[m.team1_id]?.team_name || 'TBD';
+    const n2 = teamsById[m.team2_id]?.team_name || 'TBD';
+    return `<option value="${m.id}">${escapeHtml(n1)} vs ${escapeHtml(n2)} — ${m.round_name || ('Round ' + m.round)}</option>`;
+  }).join('');
 }
 
 function initResultForm(){
@@ -344,4 +352,5 @@ function formatDate(iso){
 }
 function formatDateTime(iso){
   return new Date(iso).toLocaleString(undefined, { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-}
+          }
+      
