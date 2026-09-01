@@ -44,25 +44,6 @@
   --shadow-flat: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
 }
 
-body.dark{
-  /* palette pulled from the aerial coastal-road photo: deep ocean
-     teal base, jungle green + lagoon turquoise + terracotta rock accents */
-  --bg:#0f2e3a;
-  --shadow-dark:#081b23;
-  --shadow-light:#1c4c58;
-
-  --accent-pitch:#2fb87e;      /* jungle canopy green */
-  --accent-pitch-dim:#22935f;
-  --accent-electric:#2fd6c9;   /* shallow lagoon turquoise */
-  --accent-amber:#e08a3f;      /* sunlit terracotta road edge */
-  --accent-red:#c85a3a;        /* rust-red rock/soil */
-
-  --text-primary:#eaf6f2;
-  --text-muted:#93c0bc;
-  --text-faint:#5f8d89;
-}
-body.dark img{ filter:brightness(.9); }
-
 *{ box-sizing:border-box; }
 html{ scroll-behavior:smooth; }
 
@@ -187,18 +168,6 @@ button, input, select, textarea{ font-family:inherit; }
 .admin-view{ display:none; }
 .admin-view.active{ display:block; }
 
-.theme-toggle{
-  border:none; background:var(--bg); box-shadow:var(--shadow-raised-sm);
-  width:36px; height:36px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  color:var(--text-muted); cursor:pointer; flex:none;
-}
-.theme-toggle:active{ box-shadow:var(--shadow-pressed-sm); }
-.theme-toggle svg{ width:18px; height:18px; }
-.theme-toggle .icon-sun{ display:none; }
-body.dark .theme-toggle .icon-moon{ display:none; }
-body.dark .theme-toggle .icon-sun{ display:block; }
-
 /* ---------------- soft-UI panel primitive (was "glass") ---------------- */
 
 .glass{
@@ -287,6 +256,14 @@ body.dark .theme-toggle .icon-sun{ display:block; }
 }
 .btn-ghost{ background:transparent; box-shadow:none; }
 .btn-ghost:hover{ box-shadow:var(--shadow-raised-sm); }
+
+.link-btn{
+  background:none; border:none; padding:0; margin:0;
+  font-family:inherit; font-size:.78rem; font-weight:600;
+  color:var(--accent-electric); cursor:pointer; text-decoration:underline;
+  text-underline-offset:2px;
+}
+.link-btn:hover{ color:var(--accent-pitch-dim); }
 .btn-danger{ background:var(--bg); color:var(--accent-red); box-shadow:var(--shadow-raised-sm), inset 0 0 0 1px rgba(239,81,100,.15); }
 .btn:disabled{ opacity:.45; cursor:not-allowed; box-shadow:var(--shadow-flat); transform:none; }
 .btn-sm{ padding:9px 15px; font-size:.8rem; border-radius:11px; }
