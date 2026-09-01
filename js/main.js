@@ -20,22 +20,13 @@ document.addEventListener('DOMContentLoaded', () => {
   initModals();
   initRegisterForm();
   initResultForm();
-  initTheme();
+  initRecoverForm();
   refreshAll();
   subscribeRealtime();
 });
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-
-function initTheme(){
-  const saved = localStorage.getItem('theme');
-  if (saved === 'dark') document.body.classList.add('dark');
-  document.getElementById('themeToggle').addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-  });
 }
 
 function initTabs(){
@@ -329,6 +320,50 @@ function initResultForm(){
     form.reset();
     penaltyWrap.style.display = 'none';
     loadMatches();
+  });
+}
+
+// ---------------- code recovery ----------------
+
+function initRecoverForm(){
+  const openBtn = document.getElementById('openRecoverBtn');
+  const form = document.getElementById('recoverForm');
+  const resultBox = document.getElementById('recoverResult');
+  const msg = document.getElementById('recoverMsg');
+
+  openBtn.addEventListener('click', () => {
+    // reset to a clean state every time it's opened
+    form.reset();
+    form.style.display = '';
+    resultBox.style.display = 'none';
+    msg.className = 'msg'; msg.textContent = '';
+    openModal('recoverModal');
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.className = 'msg'; msg.textContent = '';
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Checking…';
+
+    const teamName = document.getElementById('recoverTeamName').value.trim();
+    const phone = document.getElementById('recoverPhone').value.trim();
+
+    const { data, error } = await sb.rpc('recover_team_code', {
+      p_team_name: teamName, p_phone: phone
+    });
+
+    btn.disabled = false; btn.innerHTML = 'Recover code';
+
+    if (error) {
+      msg.classList.add('show', 'msg-err');
+      msg.textContent = error.message || 'Could not recover your code. Try again.';
+      return;
+    }
+
+    document.getElementById('recoveredCode').textContent = data;
+    form.style.display = 'none';
+    resultBox.style.display = 'block';
   });
 }
 
