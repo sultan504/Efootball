@@ -14,7 +14,6 @@ const ADMIN_SECTIONS = ['adminTeams', 'adminBracket', 'adminApprovals', 'adminMa
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
   initLoginForm();
-  initTheme();
   document.getElementById('logoutBtn').addEventListener('click', () => sb.auth.signOut());
   document.getElementById('settingsForm').addEventListener('submit', saveSettings);
   document.getElementById('resetTournamentBtn').addEventListener('click', resetTournament);
@@ -41,17 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
-
-// ---------------- dark mode ----------------
-
-function initTheme(){
-  const saved = localStorage.getItem('theme');
-  if (saved === 'dark') document.body.classList.add('dark');
-  document.getElementById('themeToggle').addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-  });
 }
 
 async function checkSession(){
@@ -195,10 +183,14 @@ function renderTeamsAdmin(){
               <button type="button" class="copy-btn" data-copy="${escapeHtml(t.code)}">Copy</button>
             </div>
           </td>
-          <td><span class="badge ${t.status === 'active' ? 'badge-live' : t.status === 'champion' ? 'badge-champion' : 'badge-eliminated'}">${t.status}</span></td>
+          <td>
+            <span class="badge ${t.status === 'active' ? 'badge-live' : t.status === 'champion' ? 'badge-champion' : 'badge-eliminated'}">${t.status}</span>
+            ${isRecoveryLocked(t) ? `<span class="badge badge-disputed" style="margin-left:6px;" title="Too many failed code-recovery attempts">🔒 Recovery locked</span>` : ''}
+          </td>
           <td>
             <div class="pill-row">
               ${t.status !== 'withdrawn' ? `<button class="btn btn-sm btn-danger" data-withdraw="${t.id}">Withdraw</button>` : `<button class="btn btn-sm" data-reactivate="${t.id}">Reactivate</button>`}
+              ${isRecoveryLocked(t) ? `<button class="btn btn-sm" data-unlock-recovery="${t.id}">Unlock</button>` : ''}
               <button class="btn btn-sm btn-danger" data-delete-team="${t.id}" data-team-name="${escapeHtml(t.team_name)}">Delete</button>
             </div>
           </td>
@@ -213,6 +205,16 @@ function renderTeamsAdmin(){
   wrap.querySelectorAll('[data-reactivate]').forEach(btn => btn.addEventListener('click', () => setTeamStatus(btn.dataset.reactivate, 'active')));
   wrap.querySelectorAll('[data-copy]').forEach(btn => btn.addEventListener('click', () => copyCode(btn)));
   wrap.querySelectorAll('[data-delete-team]').forEach(btn => btn.addEventListener('click', () => deleteTeam(btn.dataset.deleteTeam, btn.dataset.teamName)));
+  wrap.querySelectorAll('[data-unlock-recovery]').forEach(btn => btn.addEventListener('click', () => unlockRecovery(btn.dataset.unlockRecovery)));
+}
+
+function isRecoveryLocked(t){
+  return !!t.recovery_locked_until && new Date(t.recovery_locked_until) > new Date();
+}
+
+async function unlockRecovery(id){
+  await sb.from('teams').update({ recovery_attempts: 0, recovery_locked_until: null }).eq('id', id);
+  loadTeamsAdmin().then(renderTeamsAdmin);
 }
 
 function copyCode(btn){
@@ -245,6 +247,11 @@ async function deleteTeam(id, teamName){
     return;
   }
   if (!confirm(`Permanently delete "${teamName}"? This can't be undone.`)) return;
+
+  // if this team is still on record as tournament champion, clear that
+  // reference first — otherwise the delete is blocked by a foreign key
+  await sb.from('tournament_settings').update({ champion_id: null }).eq('champion_id', id);
+
   const { data, error } = await sb.from('teams').delete().eq('id', id).select();
   if (error) { alert(error.message); return; }
   if (!data || !data.length) {
@@ -568,16 +575,18 @@ async function resetTournament(){
   btn.disabled = true; btn.innerHTML = '<span class="loader"></span> Resetting…';
 
   try {
+    // clear the champion reference FIRST — teams can't be deleted while
+    // tournament_settings.champion_id still points at one of them
+    const { error: sErr1 } = await sb.from('tournament_settings')
+      .update({ status: 'registration', total_rounds: null, champion_id: null })
+      .eq('id', 1);
+    if (sErr1) throw sErr1;
+
     const { error: mErr } = await sb.from('matches').delete().neq('id', '00000000-0000-0000-0000-000000000000');
     if (mErr) throw mErr;
 
     const { error: tErr } = await sb.from('teams').delete().neq('id', '00000000-0000-0000-0000-000000000000');
     if (tErr) throw tErr;
-
-    const { error: sErr } = await sb.from('tournament_settings')
-      .update({ status: 'registration', total_rounds: null, champion_id: null })
-      .eq('id', 1);
-    if (sErr) throw sErr;
 
     msg.classList.add('show', 'msg-ok');
     msg.textContent = 'Tournament reset. Registration is open again with no teams.';
