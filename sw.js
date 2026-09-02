@@ -1,10 +1,3 @@
-// ==================================================================
-// Service worker — caches the static app shell only.
-// Supabase requests (live scores, teams, auth) are never cached here,
-// so admins and players always see live data; only the HTML/CSS/JS/
-// icons that make up the app itself are served from cache when offline.
-// ==================================================================
-
 const CACHE_NAME = 'efootball-shell-v2';
 const SHELL_FILES = [
   'index.html',
