@@ -1,17 +1,10 @@
 const CACHE_NAME = 'efootball-shell-v2';
 const SHELL_FILES = [
-  'index.html',
-  'admin.html',
-  'css/style.css',
-  'js/main.js',
-  'js/admin.js',
-  'js/config.js',
-  'js/theme.js',
-  'manifest.json',
-  'manifest-admin.json',
-  'icons/icon-192.png',
-  'icons/icon-512.png'
+  'index.html', 'css/style.css', 'js/main.js',
+  'js/config.js', 'js/theme.js',
+  'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png'
 ];
+
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
