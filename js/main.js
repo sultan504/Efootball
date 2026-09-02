@@ -1,7 +1,3 @@
-// ==================================================================
-// Public site logic
-// ==================================================================
-
 const STATUS_LABEL = {
   pending_teams: { text: 'TBD', cls: 'badge-eliminated' },
   awaiting_schedule: { text: 'Needs schedule', cls: 'badge-pending' },
@@ -69,7 +65,6 @@ async function refreshAll(){
   await Promise.all([loadSettings(), loadMatches(), loadGroups()]);
 }
 
-// ---------------- settings / hero stats ----------------
 
 async function loadSettings(){
   const { data, error } = await sb.from('tournament_settings').select('*').eq('id', 1).single();
@@ -95,7 +90,6 @@ async function loadSettings(){
   }
 }
 
-// ---------------- teams ----------------
 
 async function loadTeams(){
   const { data, error } = await sb.from('teams_public').select('*').order('created_at', { ascending: true });
@@ -176,8 +170,6 @@ function updateHeroStats(){
   // Hero stat chips (Teams / Still In / Matches Played) were removed from the UI.
 }
 
-// ---------------- groups ----------------
-
 async function loadGroups(){
   const [{ data: groups, error: gErr }, { data: standings, error: sErr }] = await Promise.all([
     sb.from('groups').select('*').order('name', { ascending: true }),
@@ -242,8 +234,6 @@ function groupCardHtml(group, qualifiers){
     <div class="standings-legend"><span class="dot"></span> Qualifies for the knockouts</div>
   </div>`;
 }
-
-// ---------------- matches / bracket ----------------
 
 async function loadMatches(){
   const { data, error } = await sb
@@ -317,11 +307,6 @@ function currentRoundPillHtml(rounds, roundNums){
   return `<span class="round-pill">🏆 ${escapeHtml(name || 'Final')} decided</span>`;
 }
 
-// Draws the "road to the final" connector lines between a match and
-// the next-round match its winner feeds into, using the same
-// match_index/2 pairing the database uses to advance winners. Runs
-// after the DOM is painted so card heights (which vary because they
-// space out with justify-content:space-around) are accurate.
 function drawBracketConnectors(rounds, roundNums){
   requestAnimationFrame(() => {
     const track = document.getElementById('bracketTrack');
@@ -403,8 +388,6 @@ function matchCardHtml(m){
   </div>`;
 }
 
-// ---------------- registration ----------------
-
 function initRegisterForm(){
   const form = document.getElementById('registerForm');
   form.addEventListener('submit', async (e) => {
@@ -438,8 +421,6 @@ function initRegisterForm(){
     loadTeams();
   });
 }
-
-// ---------------- submit result ----------------
 
 function populateResultMatchSelect(){
   const sel = document.getElementById('resultMatchSelect');
@@ -523,8 +504,6 @@ function initResultForm(){
   });
 }
 
-// ---------------- code recovery ----------------
-
 function initRecoverForm(){
   const openBtn = document.getElementById('openRecoverBtn');
   const form = document.getElementById('recoverForm');
@@ -567,8 +546,6 @@ function initRecoverForm(){
   });
 }
 
-// ---------------- realtime ----------------
-
 function subscribeRealtime(){
   sb.channel('public-changes')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, () => { loadMatches(); loadGroups(); })
@@ -578,7 +555,6 @@ function subscribeRealtime(){
     .subscribe();
 }
 
-// ---------------- helpers ----------------
 
 function escapeHtml(str){
   return String(str ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
