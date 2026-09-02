@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#e6e9ef" id="themeColorMeta">
+<script>
+(function(){
+  try{
+    var t = localStorage.getItem('ef_theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  }catch(e){}
+})();
+</script>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>eFootball Championship — Live Bracket</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="install-banner" id="installBanner" hidden>
+  <img src="icons/icon-192.png" alt="" class="install-banner-icon">
+  <div class="install-banner-text">
+    <strong>Install eFootball Championship</strong>
+    <span>Add it to your home screen for quick access.</span>
+  </div>
+  <button type="button" class="btn btn-primary" id="installBtn">Install</button>
+  <button type="button" class="install-banner-close" id="installDismiss" aria-label="Dismiss">&times;</button>
+</div>
+
+<header class="topbar">
+  <a class="brand" href="#">
+    <span class="dot"></span>
+    <span id="tournamentName">eFootball Championship</span>
+  </a>
+  <nav class="tabs">
+    <button class="tab-btn" data-target="groupsView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8.5 4.5v15"/></svg>
+      <span>Groups</span>
+    </button>
+    <button class="tab-btn active" data-target="bracketView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h4v4H4zM4 15h4v4H4zM16 10h4v4h-4z"/><path d="M8 7h4a2 2 0 0 1 2 2v1M8 17h4a2 2 0 0 1 2-2v-1"/></svg>
+      <span>Bracket</span>
+    </button>
+    <button class="tab-btn" data-target="teamsView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3-5.5 7-5.5s7 2.2 7 5.5"/><circle cx="17" cy="7" r="2.4"/><path d="M16.5 14.6c2.9.4 5 2.4 5 5.4"/></svg>
+      <span>Teams</span>
+    </button>
+    <button class="tab-btn" data-target="registerView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.4 3-5.7 6.5-5.7"/><path d="M17 8v6M14 11h6"/></svg>
+      <span>Register</span>
+    </button>
+    <button class="tab-btn" data-target="submitView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+      <span>Submit</span>
+    </button>
+  </nav>
+  <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.5 12H5M19 12h2.5M4.2 19.8L6 18M18 6l1.8-1.8"/></svg>
+  </button>
+</header>
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="tab-btn bottom-tab" data-target="groupsView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8.5 4.5v15"/></svg>
+      <span>Groups</span>
+    </button>
+    <button class="tab-btn bottom-tab active" data-target="bracketView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h4v4H4zM4 15h4v4H4zM16 10h4v4h-4z"/><path d="M8 7h4a2 2 0 0 1 2 2v1M8 17h4a2 2 0 0 1 2-2v-1"/></svg>
+      <span>Bracket</span>
+    </button>
+    <button class="tab-btn bottom-tab" data-target="teamsView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3-5.5 7-5.5s7 2.2 7 5.5"/><circle cx="17" cy="7" r="2.4"/><path d="M16.5 14.6c2.9.4 5 2.4 5 5.4"/></svg>
+      <span>Teams</span>
+    </button>
+    <button class="tab-btn bottom-tab" data-target="registerView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.4 3-5.7 6.5-5.7"/><path d="M17 8v6M14 11h6"/></svg>
+      <span>Register</span>
+    </button>
+    <button class="tab-btn bottom-tab" data-target="submitView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+      <span>Submit</span>
+    </button>
+  </div>
+</nav>
+
+<main class="shell">
+
+  <section class="hero">
+    <div class="eyebrow"><span class="live-pulse"></span> <span id="tournamentStatus">Registration open</span></div>
+    <h1>The knockout stage, <span>live</span>.</h1>
+    <p>Every fixture, every scoreline, every upset — updated the moment the admin confirms a result.</p>
+
+    <div id="championBanner" class="glass glass-strong" style="display:none;align-items:center;gap:14px;padding:18px 22px;margin-top:24px;">
+      <span style="font-size:1.8rem;">🏆</span>
+      <div>
+        <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;">Champion</div>
+        <div class="champ-name" style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--accent-pitch);"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="groupsView" class="view">
+    <div class="section-head">
+      <h2>Group stage</h2>
+      <span class="sub" id="groupsSub">Top teams from each group advance to the knockouts</span>
+    </div>
+    <div id="groupsWrap"></div>
+  </section>
+
+  <section id="bracketView" class="view active">
+    <div class="section-head">
+      <h2>Knockout draw</h2>
+      <span class="sub" id="bracketRoundPill"></span>
+    </div>
+    <div id="bracketWrap"></div>
+  </section>
+
+  <section id="teamsView" class="view">
+    <div class="section-head">
+      <h2>Registered teams</h2>
+      <span class="sub">Tap a team to see their match history</span>
+    </div>
+    <div id="teamsGrid" class="teams-grid"></div>
+  </section>
+
+  <section id="registerView" class="view">
+    <div class="section-head"><h2>Register your team</h2></div>
+    <div class="grid-2">
+      <form id="registerForm" class="glass glass-pad">
+        <div class="field">
+          <label for="regTeamName">eFootball team name</label>
+          <input id="regTeamName" type="text" placeholder="e.g. FC Nightfall" required maxlength="60">
+        </div>
+        <div class="field">
+          <label for="regOwnerName">Your name (optional)</label>
+          <input id="regOwnerName" type="text" placeholder="Who's playing" maxlength="60">
+        </div>
+        <div class="field">
+          <label for="regPhone">Phone number</label>
+          <input id="regPhone" type="tel" placeholder="e.g. 080XXXXXXXX" required maxlength="20">
+        </div>
+        <div class="field">
+          <label for="regPreferredTime">Most appropriate time for your matches</label>
+          <input id="regPreferredTime" type="text" placeholder="e.g. Weekday evenings after 7pm" maxlength="120">
+          <div class="hint">The admin uses this to pair you with opponents free at the same time.</div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Register team</button>
+        <div id="registerMsg" class="msg"></div>
+      </form>
+
+      <div class="glass glass-pad">
+        <h3>How it works</h3>
+        <ol style="color:var(--text-muted); padding-left:18px; line-height:1.9;">
+          <li>Register your team name, phone number and your best playing time.</li>
+          <li>You'll receive a one-time secret code — save it, you'll need it to submit results.</li>
+          <li>The admin schedules your fixtures once the bracket opens.</li>
+          <li>After a match, either player submits the score using their code.</li>
+          <li>The admin verifies and approves — the bracket updates automatically.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="submitView" class="view">
+    <div class="section-head"><h2>Submit a match result</h2></div>
+    <form id="resultForm" class="glass glass-pad" style="max-width:520px;">
+      <div class="field">
+        <label for="resultMatchSelect">Fixture</label>
+        <select id="resultMatchSelect" required></select>
+      </div>
+      <div class="field">
+        <label for="resultCode">Your team code</label>
+        <input id="resultCode" type="text" placeholder="e.g. 4F2A9C" required maxlength="10" class="mono" style="text-transform:uppercase;">
+        <button type="button" class="link-btn" id="openRecoverBtn" style="margin-top:6px;">Forgot your code?</button>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="resultScore1">Home score</label>
+          <input id="resultScore1" type="number" min="0" required>
+        </div>
+        <div class="field">
+          <label for="resultScore2">Away score</label>
+          <input id="resultScore2" type="number" min="0" required>
+        </div>
+      </div>
+      <div id="penaltyWrap" class="field-row" style="display:none;">
+        <div class="field">
+          <label for="resultPen1">Home penalties</label>
+          <input id="resultPen1" type="number" min="0">
+        </div>
+        <div class="field">
+          <label for="resultPen2">Away penalties</label>
+          <input id="resultPen2" type="number" min="0">
+        </div>
+      </div>
+      <div class="hint" id="penaltyHint" style="margin-bottom:14px;">Home / away order matches the fixture as shown in the bracket. Level scores need a penalty result.</div>
+      <button type="submit" class="btn btn-primary btn-block">Submit result for approval</button>
+      <div id="resultMsg" class="msg"></div>
+    </form>
+  </section>
+
+  <div class="footer">Built for the community · Results are final only once admin-approved.</div>
+</main>
+  
+<div class="modal-backdrop" id="codeModal" data-close-modal>
+  <div class="glass modal">
+    <button class="modal-close" data-close-modal>&times;</button>
+    <h3>You're in, <span id="revealedTeamName"></span> 🎮</h3>
+    <p class="hint">This code is shown only once. Save it — you'll need it to submit your match results.</p>
+    <div class="code-reveal" id="revealedCode"></div>
+    <button class="btn btn-primary btn-block" data-close-modal>Got it</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="recoverModal" data-close-modal>
+  <div class="glass modal">
+    <button class="modal-close" data-close-modal>&times;</button>
+    <h3>Recover your team code</h3>
+    <p class="hint">Enter your team name and the phone number you registered with — if they match, we'll show your code.</p>
+    <form id="recoverForm">
+      <div class="field">
+        <label for="recoverTeamName">Team name</label>
+        <input id="recoverTeamName" type="text" placeholder="e.g. FC Nightfall" required maxlength="60">
+      </div>
+      <div class="field">
+        <label for="recoverPhone">Phone number</label>
+        <input id="recoverPhone" type="tel" placeholder="The number you registered with" required maxlength="20">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Recover code</button>
+      <div id="recoverMsg" class="msg"></div>
+    </form>
+    <div id="recoverResult" style="display:none;">
+      <p class="hint">Here's your code — save it somewhere safe this time.</p>
+      <div class="code-reveal" id="recoveredCode"></div>
+      <button type="button" class="btn btn-primary btn-block" data-close-modal>Got it</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="teamHistoryModal" data-close-modal>
+  <div class="glass modal" style="max-width:480px;">
+    <button class="modal-close" data-close-modal>&times;</button>
+    <h3 id="teamModalName"></h3>
+    <div class="pill-row" style="margin-bottom:8px;">
+      <span id="teamModalStatus" class="badge"></span>
+    </div>
+    <p class="hint" id="teamModalRecord"></p>
+    <div id="teamModalHistory" style="max-height:320px; overflow-y:auto; margin-top:10px;"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
