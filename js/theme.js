@@ -1,13 +1,3 @@
-// ==================================================================
-// Dark mode toggle
-// ------------------------------------------------------------------
-// The theme itself is already applied before first paint by a tiny
-// inline script in <head> (see index.html / admin.html) — that's
-// what stops a flash of the wrong colours. This file just wires up
-// the toggle button(s) and keeps localStorage + the browser's
-// theme-color meta tag in sync with whatever the person picks.
-// ==================================================================
-
 (function () {
   const KEY = 'ef_theme';
   const LIGHT_COLOR = '#e6e9ef';
