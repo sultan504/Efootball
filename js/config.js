@@ -1,4 +1,0 @@
-const SUPABASE_URL = "https://psbslduycrftfdkajqut.supabase.co";
-const SUPABASE_ANON_KEY = " eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzYnNsZHV5Y3JmdGZka2FqcXV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3ODAwMjgsImV4cCI6MjEwMzM1NjAyOH0.ytmnZw0ELYNGzpzxATqxjs3euMJ_delht2A4eoi4CKQ ";
-
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
