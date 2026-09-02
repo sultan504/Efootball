@@ -21,9 +21,6 @@
   window.toggleTheme = function () {
     setTheme(currentTheme() === 'dark' ? 'light' : 'dark');
   };
-
-  // sync the meta tag immediately in case the inline pre-paint script
-  // picked a theme different from the meta tag's hardcoded default
   applyMetaColor(currentTheme());
 
   document.addEventListener('DOMContentLoaded', function () {
